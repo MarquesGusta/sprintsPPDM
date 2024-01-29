@@ -33,7 +33,7 @@ BEGIN
     END IF;
 END // 
 DELIMITER ;
-
+call excluirLista(2);
 
 -- Modificação de lista		/ deu certo
 DELIMITER //
@@ -44,7 +44,7 @@ CREATE PROCEDURE modificarLista(
 BEGIN
 	DECLARE row_count INT;
     
-    -- Verificar se a lista a ser modificada existe
+    -- Verifica se a lista a ser modificada existe
     SELECT COUNT(*) INTO row_count FROM listas WHERE pk_idLista = listaAlterada;
     
     IF row_count > 0 THEN
@@ -58,40 +58,40 @@ BEGIN
     END IF;
 END // 
 DELIMITER ;
-call modificarLista(4, "Frutas");
+call modificarLista(2, "Frutas");
 
 
--- Adição de tarefa		/ ainda não criada
+-- Adição de tarefa		/ deu certo
 DELIMITER //
-CREATE PROCEDURE criarLista(
+CREATE PROCEDURE criarTarefa(
 	IN lista int,
     IN tarefa varchar(30),
     IN descTarefa varchar(200),
-    IN criacao date , 
-    IN entrega date,
-    situacao enum("feito", "nao feito")
+    IN tipoTarefa enum("pessoal", "comercial", "outro")
 )
 BEGIN
-	INSERT INTO tarefas (fk_idLista, nomeTarefa, descricao, dataCriacao, dataEntrega, status) values (lista, tarefa, descTarefa, criacao, entrega, situacao);
+	DECLARE row_count INT;
+
+	-- Verifica se a lista especificada existe
+    SELECT COUNT(*) INTO row_count FROM listas WHERE pk_idLista = lista;
+    
+    IF row_count > 0 THEN
+		-- Se a lista existe inserire a tarefa na tabela de tarefas
+		INSERT INTO tarefas (fk_idLista, nomeTarefa, descricao, dataCriacao, tipo, status) 
+		VALUES (lista, tarefa, descTarefa, curdate(), tipoTarefa, "nao feito");
+	ELSE
+		-- Se a lista não existe, emite um aviso
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'A lista especificada não existe.';
+    END IF;
 END // 
 DELIMITER ;
-
+drop procedure criarTarefa;
+call criarTarefa(2, "maçã", null, "pessoal");
 
 -- Exclusão de tarefa
 
--- Modificação de tarefa
--- nome
-
--- descriçãoptimize
-
--- data de entrega
-
--- retornar status nao feito
-
--- retornar status feito
+-- Modificação de tarefa (nome, desc, tipo)
 
 -- Alterar status para feito
 
 -- Alterar status para nao feito
-
--- Visualização da tarefa
