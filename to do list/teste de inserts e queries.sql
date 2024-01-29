@@ -3,10 +3,6 @@ insert into listas (nomeLista) values ("Materiais escolares");
 insert into listas (nomeLista) values ("Tarefas");
 select * from listas;
 
--- SET @data_formatada = DATE_FORMAT(@data_formatada, '%d/%m/%Y');
--- select @data_formatada;
-
-truncate tarefas;
 select * from tarefas;
 insert into tarefas (fk_idLista, nomeTarefa, descricao, dataCriacao, dataEntrega, status) values (1, "Arroz", null , curdate(), null, "feito");
 insert into tarefas (fk_idLista, nomeTarefa, descricao, dataCriacao, dataEntrega, status) values (1, "Feijão", null , curdate(), null, "nao feito");
@@ -23,10 +19,8 @@ insert into tarefas (fk_idLista, nomeTarefa, descricao, dataCriacao, dataEntrega
 select
 	*
 from
-	listas
-join
-	tarefas
-on
-	pk_idLista = fk_idlista
-where
-	nomeLista = "Mercado" AND status = "nao feito"
+	tarefas;
+    
+update tarefas
+set status = "feito"
+where pk_idTarefa = 5

@@ -16,8 +16,7 @@ create table tarefas(
     descricao varchar(200),
     dataCriacao date NOT NULL,
     dataEntrega date,
-    status enum("feito", "nao feito") NOT NULL,
+    status enum("feito", "nao feito") NOT NULL DEFAULT "nao feito",
     
-    -- CHECK(dataEntrega ("--/--/----")),
     FOREIGN KEY(fk_idLista) REFERENCES listas(pk_idLista)
 );
