@@ -10,7 +10,7 @@ DELIMITER ;
 call criarLista("Frutas para comprar");
 
 
--- Exclusão de lista		/ ainda não criada
+-- Exclusão de lista		/ deu certo
 DELIMITER //
 CREATE PROCEDURE excluirLista(
 	IN listaExcluida int
@@ -33,7 +33,7 @@ BEGIN
     END IF;
 END // 
 DELIMITER ;
-call excluirLista(2);
+call excluirLista(4);
 
 -- Modificação de lista		/ deu certo
 DELIMITER //
@@ -58,7 +58,7 @@ BEGIN
     END IF;
 END // 
 DELIMITER ;
-call modificarLista(2, "Frutas");
+call modificarLista(4, "Frutas");
 
 
 -- Adição de tarefa		/ deu certo
@@ -86,12 +86,110 @@ BEGIN
 END // 
 DELIMITER ;
 drop procedure criarTarefa;
-call criarTarefa(2, "maçã", null, "pessoal");
+call criarTarefa(4, "banana", null, "pessoal");
 
--- Exclusão de tarefa
 
--- Modificação de tarefa (nome, desc, tipo)
+-- Exclusão de tarefa		/ deu certo
+DELIMITER //
+CREATE PROCEDURE excluirTarefa(
+	IN tarefaExcluida int
+)
+BEGIN
+	DECLARE row_count INT;
+    
+    -- Verifica se a tarefa a ser excluída existe
+    SELECT COUNT(*) INTO row_count FROM tarefas WHERE pk_idTarefa = tarefaExcluida;
+    
+    IF row_count > 0 THEN
+        -- Se a tarefa existir ela será excluída
+        DELETE FROM tarefas WHERE pk_idTarefa = tarefaExcluida;
+    ELSE
+        -- Se a tarefa não existe, emitirá um aviso
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'A tarefa especificada não existe.';
+    END IF;
+END // 
+DELIMITER ;
+call excluirTarefa(1);
 
--- Alterar status para feito
 
--- Alterar status para nao feito
+-- Modificação de tarefa (nome, desc, tipo)		/ deu certo
+DELIMITER //
+CREATE PROCEDURE modificarTarefa(
+	IN tarefa int,
+    IN novoNome varchar(30),
+    IN novaDesc varchar(200),
+    IN novoTipo enum("pessoal", "comercial", "outro")
+)
+BEGIN
+	DECLARE row_count INT;
+
+	-- Verifica se a tarefa a ser modificada existe
+    SELECT COUNT(*) INTO row_count FROM tarefas WHERE pk_idTarefa = tarefa;
+    
+    IF row_count > 0 THEN
+        -- Se a tarefa existir ela será modificada
+        UPDATE tarefas
+		SET nomeTarefa = novoNome,
+		descricao = novaDesc,
+		tipo = novoTipo
+		WHERE pk_idTarefa = tarefa;
+    ELSE
+        -- Se a tarefa não existe, emitirá um aviso
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'A tarefa especificada não existe.';
+    END IF;
+	
+END // 
+DELIMITER ;
+call modificarTarefa(1, "Arroz", null, "Outro");
+
+
+-- Alterar status para feito		/ deu certo
+DELIMITER //
+CREATE PROCEDURE marcarFeito(
+	IN tarefaFeita int
+)
+BEGIN
+	DECLARE row_count INT;
+
+	-- Verifica se a tarefa que será marcada como feita existe
+    SELECT COUNT(*) INTO row_count FROM tarefas WHERE pk_idTarefa = tarefaFeita;
+    
+    IF row_count > 0 THEN
+        -- Se a tarefa existir ela será marcada como feita
+        UPDATE tarefas
+		SET status = "feito"
+		WHERE pk_idTarefa = tarefaFeita;
+    ELSE
+        -- Se a tarefa não existe, emitirá um aviso
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'A tarefa especificada não existe.';
+    END IF;
+END // 
+DELIMITER ;
+drop procedure marcarFeito;
+call marcarFeito(2);
+
+
+-- Alterar status para nao feito		/ deu certo
+DELIMITER //
+CREATE PROCEDURE desmarcarFeito(
+	IN tarefaNaoFeita int
+)
+BEGIN
+	DECLARE row_count INT;
+
+	-- Verifica se a tarefa que será marcada como nao feita existe
+    SELECT COUNT(*) INTO row_count FROM tarefas WHERE pk_idTarefa = tarefaNaoFeita;
+    
+    IF row_count > 0 THEN
+        -- Se a tarefa existir ela será marcada como nao feita
+        UPDATE tarefas
+		SET status = "nao feito"
+		WHERE pk_idTarefa = tarefaNaoFeita;
+    ELSE
+        -- Se a tarefa não existe, emitirá um aviso
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'A tarefa especificada não existe.';
+    END IF;
+END // 
+DELIMITER ;
+drop procedure desmarcarFeito;
+call desmarcarFeito(3);
